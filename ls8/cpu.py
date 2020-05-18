@@ -7,7 +7,30 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
+        self.ram = [0]*255
+        self.register = [0]*8
+        self.pc = 0 # program counter
         pass
+
+    def ram_read(self, mar): # mar = address in binary 
+        # turn mar (memory address register)
+        # into a base 10 number
+        # that is the point in the ram you want to access
+        # and return.
+        # mar should be <= 255
+        # and the value stored at that memory location
+        # should also be less than 255
+        # in this case we aren't really storing bytes we are 
+        # storing values in ram, and as long as those values can
+        # be represented by a number less than 255 the computer will work
+        return self.ram[mar]
+
+    def ram_write(self, mdr, mar): # mdr = data , mar = address
+        # store mdr in ram[mar]
+        self.ram[mar] = mdr
+        print('success')
+        pass
+
 
     def load(self):
         """Load a program into memory."""
@@ -62,4 +85,42 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
+        TEST = 0
+        HLT = 1
+        PRN = 71
+        LDI = 130
+
+        while True:
+            ir = self.ram[self.pc] # instruction register = point in ram (specified by program counter)
+            operand_a = self.ram[self.pc+1]
+            operand_b = self.ram[self.pc+2]
+            if ir == TEST:
+                print('test acheived')
+                sys.exit()
+                pass
+            
+            elif ir == PRN:
+                # Print the contents of the value stored in register[operand_a]
+                value = self.register[operand_a]
+                print(value)
+                self.pc += 2
+                pass
+
+            elif ir == LDI:
+                # set the operand_a register
+                # to the value operand_b
+                self.register[operand_a] = operand_b
+                self.pc += 3
+                pass
+
+            elif ir == HLT:
+                print('end of program')
+                sys.exit()
+                pass
+
+            else:
+                print(f'Invalid instruction {ir} at pc location {self.pc}')
+                sys.exit()
+                pass
+
         pass
