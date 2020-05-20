@@ -6,6 +6,6 @@ import sys
 from cpu import *
 
 cpu = CPU()
-
-cpu.load()
+programpath = 'G:\\Data\\Lambda\\CS\\Computer-Architecture\\ls8\examples\\mult.ls8'
+cpu.load(programpath)
 cpu.run()

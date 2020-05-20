@@ -8,7 +8,7 @@ class CPU:
     def __init__(self):
         """Construct a new CPU."""
         self.ram = [0]*255
-        self.register = [0]*8
+        self.reg = [0]*8
         self.pc = 0 # program counter
         pass
 
@@ -32,34 +32,44 @@ class CPU:
         pass
 
 
-    def load(self):
+    def load(self,filepath):
         """Load a program into memory."""
+        with open(filepath,'r') as f:
+            program = f.read().splitlines()
 
         address = 0
 
         # For now, we've just hardcoded a program:
 
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+        # program = [
+        #     # From print8.ls8
+        #     0b10000010, # LDI R0,8
+        #     0b00000000,
+        #     0b00001000,
+        #     0b01000111, # PRN R0
+        #     0b00000000,
+        #     0b00000001, # HLT
+        # ]
 
         for instruction in program:
-            self.ram[address] = instruction
+            if instruction == ' ' or instruction == "":
+                continue
+            elif instruction[0] == '#':
+                continue
+            self.ram[address] = int(instruction.split()[0],2)
             address += 1
 
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
+        ADD = 160
+        MUL = 162
 
-        if op == "ADD":
+        if op == ADD:
             self.reg[reg_a] += self.reg[reg_b]
         #elif op == "SUB": etc
+        elif op == MUL:
+            self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -89,7 +99,9 @@ class CPU:
         HLT = 1
         PRN = 71
         LDI = 130
-
+        ADD = 160
+        MUL = 162
+        ALU = [ADD,MUL]
         while True:
             ir = self.ram[self.pc] # instruction register = point in ram (specified by program counter)
             operand_a = self.ram[self.pc+1]
@@ -98,10 +110,15 @@ class CPU:
                 print('test acheived')
                 sys.exit()
                 pass
-            
+
+            if ir in ALU:
+                self.alu(ir,operand_a,operand_b)
+                self.pc +=3
+                pass
+
             elif ir == PRN:
                 # Print the contents of the value stored in register[operand_a]
-                value = self.register[operand_a]
+                value = self.reg[operand_a]
                 print(value)
                 self.pc += 2
                 pass
@@ -109,7 +126,7 @@ class CPU:
             elif ir == LDI:
                 # set the operand_a register
                 # to the value operand_b
-                self.register[operand_a] = operand_b
+                self.reg[operand_a] = operand_b
                 self.pc += 3
                 pass
 
