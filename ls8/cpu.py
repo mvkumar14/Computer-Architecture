@@ -10,6 +10,7 @@ class CPU:
         self.ram = [0]*255
         self.reg = [0]*8
         self.pc = 0 # program counter
+        self.sp = 242
         pass
 
     def ram_read(self, mar): # mar = address in binary 
@@ -66,10 +67,11 @@ class CPU:
         MUL = 162
 
         if op == ADD:
-            self.reg[reg_a] += self.reg[reg_b]
+            self.reg[reg_a] += self.reg[reg_b] # may neeed % 256
         #elif op == "SUB": etc
         elif op == MUL:
-            self.reg[reg_a] *= self.reg[reg_b]
+            self.reg[reg_a] *= self.reg[reg_b] 
+            self.reg[reg_a] = self.reg[reg_a] % 255
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -102,6 +104,9 @@ class CPU:
         ADD = 160
         MUL = 162
         ALU = [ADD,MUL]
+        #Stack
+        PUSH = 69
+        POP = 70
         while True:
             ir = self.ram[self.pc] # instruction register = point in ram (specified by program counter)
             operand_a = self.ram[self.pc+1]
@@ -111,9 +116,21 @@ class CPU:
                 sys.exit()
                 pass
 
-            if ir in ALU:
+            elif ir == PUSH:
+                self.ram[self.sp] = self.reg[operand_a]
+                self.sp -= 1
+                self.pc += 2
+                pass
+
+            elif ir == POP:
+                self.sp += 1
+                self.reg[operand_a] = self.ram[self.sp]
+                self.pc += 2
+                pass
+
+            elif ir in ALU:
                 self.alu(ir,operand_a,operand_b)
-                self.pc +=3
+                self.pc +=3 # TODO check to make sure that this assumption is correct
                 pass
 
             elif ir == PRN:
