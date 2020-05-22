@@ -11,6 +11,7 @@ class CPU:
         self.reg = [0]*8
         self.pc = 0 # program counter
         self.sp = 242
+        self.fl = [0]*8 # flags (00000LGE)
         pass
 
     def ram_read(self, mar): # mar = address in binary 
@@ -110,6 +111,11 @@ class CPU:
         # Subroutines:
         CALL = 80
         RET = 17
+        # Comparisons:
+        CMP = 167
+        JMP = 84
+        JEQ = 85
+        JNE = 86
         while True:
             ir = self.ram[self.pc] # instruction register = point in ram (specified by program counter)
             operand_a = self.ram[self.pc+1]
@@ -117,6 +123,35 @@ class CPU:
             if ir == TEST:
                 print('test acheived')
                 sys.exit()
+                pass
+
+            elif ir == CMP:
+                #set the LGE flags on self.fl
+                if self.reg[operand_a] < self.reg[operand_b]: 
+                    self.fl[-3] = 1
+                elif self.reg[operand_a] > self.reg[operand_b]:
+                    self.fl[-2] = 1
+                else:
+                    self.fl[-1] = 1
+                self.pc += 3
+                pass
+            
+            elif ir == JMP:
+                self.pc = self.reg[operand_a]
+                pass
+
+            elif ir == JNE:
+                if self.fl[-1] == 0:
+                    self.pc = self.reg[operand_a]
+                else:
+                    self.pc += 2
+                pass
+
+            elif ir == JEQ:
+                if self.fl[-1] == 1:
+                    self.pc = self.reg[operand_a]
+                else:
+                    self.pc += 2
                 pass
 
             elif ir == CALL:
