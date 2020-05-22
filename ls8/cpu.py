@@ -107,6 +107,9 @@ class CPU:
         #Stack
         PUSH = 69
         POP = 70
+        # Subroutines:
+        CALL = 80
+        RET = 17
         while True:
             ir = self.ram[self.pc] # instruction register = point in ram (specified by program counter)
             operand_a = self.ram[self.pc+1]
@@ -116,15 +119,40 @@ class CPU:
                 sys.exit()
                 pass
 
-            elif ir == PUSH:
-                self.ram[self.sp] = self.reg[operand_a]
+            elif ir == CALL:
+                # push pc + 1 onto the stack
+                # change pc to the 
                 self.sp -= 1
+                self.ram[self.sp] = self.pc + 1
+                self.pc = self.reg[operand_a]
+                pass
+                
+            elif ir == RET:
+                # pop the location off of the stack
+                # and set the pc to that location
+                # the assumption here is that any stack usage
+                # by the subroutine is cleared by the time
+                # RET is called
+                self.pc = self.ram[self.sp]
+                self.sp += 1 
+                pass
+
+            # TODO STack operations won't clear out memory. So you 
+            # overwrite old memory in the stack instead of setting the 
+            # stack to zero. Is this expected behavior?
+
+            # TODO : Write a helper function that does push and pop
+            # so that you don't repeat stack code in RET and 
+            # in CALL.
+            elif ir == PUSH:
+                self.sp -= 1
+                self.ram[self.sp] = self.reg[operand_a]
                 self.pc += 2
                 pass
 
             elif ir == POP:
-                self.sp += 1
                 self.reg[operand_a] = self.ram[self.sp]
+                self.sp += 1
                 self.pc += 2
                 pass
 

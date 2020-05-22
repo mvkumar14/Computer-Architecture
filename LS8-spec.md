@@ -290,7 +290,7 @@ Machine code:
 01
 ```
 
-### INC
+### INC (increment)
 
 *This is an instruction handled by the ALU.*
 
@@ -441,7 +441,7 @@ Machine code:
 83 0a 0b
 ```
 
-### LDI
+### LDI (Load Into)
 
 `LDI register immediate`
 
@@ -541,7 +541,7 @@ Machine code:
 46 0r
 ```
 
-### PRA
+### PRA (print alpha)
 
 `PRA register` pseudo-instruction
 
